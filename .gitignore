@@ -32,14 +32,6 @@ ENV/
 *.swo
 .DS_Store
 
-# Model files and data
-#*.h5
-#*.pkl
-#*.pth
-#data/
-#models/
-#*.weights
-
 # Jupyter Notebook
 .ipynb_checkpoints
 

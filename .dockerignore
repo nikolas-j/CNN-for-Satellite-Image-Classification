@@ -1,0 +1,14 @@
+# .dockerignore
+
+# Virtual environment and PyCharm/VS Code files
+.venv/
+.vscode/
+__pycache__/
+
+# Git-related files
+.git/
+.gitignore
+
+# Local configuration files
+.env
+tests/
