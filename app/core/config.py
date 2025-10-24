@@ -1,7 +1,6 @@
 # Configuration settings for the application
 
-
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 # Placeholder for configuration settings
 class Settings(BaseSettings):

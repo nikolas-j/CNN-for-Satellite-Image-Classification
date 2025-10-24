@@ -11,13 +11,12 @@ from app.ml.utils import make_predictions
 
 
 class ShipClassifier:
-    def __init__(self, model_path: str, class_names: list):
+    def __init__(self, model_path: str):
         """
-        Initializes the ShipClassifier with the given model path and class names.
+        Initializes the ShipClassifier with the given model path.
         Loads the model weights from the specified path.
         """
 
-        self.class_names = class_names
         self.model = CNNShipClassifier()
         self.model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         self.model.eval()

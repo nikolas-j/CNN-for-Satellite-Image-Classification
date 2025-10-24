@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from app.api import endpoints  # Import the router from our endpoints file
-from app.core.config import settings # We'll use this for the title
+from app.core.config import settings # Import configuration settings
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
