@@ -2,9 +2,6 @@
 
 
 
-
-
-
 ### How It All Works:
 
 1. Request: 
@@ -28,3 +25,5 @@ A user sends an HTTP POST request to http://your-server.com/api/v1/predict and a
 - Inference: If validation passes, the file's bytes are read and passed to predictor.predict(...).
 
 - Response: The function returns a PredictionResponse object. FastAPI automatically converts this Pydantic object into a clean JSON string and sends it back to the user with a 200 OK status.
+
+
