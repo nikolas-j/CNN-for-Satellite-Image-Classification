@@ -29,18 +29,6 @@ def test_predict_success():
             data=data_payload
         )
     
-    # 🚨 TEMPORARY DIAGNOSTIC CODE 🚨
-    if response.status_code != 200:
-        print("\n--- API Traceback (500 Error) ---")
-        # Try to print the JSON detail if it exists
-        try:
-            print(response.json())
-        except:
-            # If no JSON, print the raw text content
-            print(response.text)
-        print("---------------------------------")
-    # 🚨 END DIAGNOSTIC CODE 🚨
-    
     assert response.status_code == 200
     data = response.json()
     assert "ship_count" in data
