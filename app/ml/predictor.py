@@ -16,7 +16,7 @@ class ShipClassifier:
         self.model.eval()
 
         self.TILE_SIZE = 80  # Depends on model input size
-        self.STRIDE = 20     # Stride for tiling -> Trade off between speed and accuracy
+        self.STRIDE = 15     # Stride for tiling -> Trade off between speed and accuracy
         self.DISTANCE_THRESHOLD = 150  # meters for clustering positions
 
     # Called from endpoints.py

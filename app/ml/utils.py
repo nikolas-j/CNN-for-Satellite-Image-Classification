@@ -1,7 +1,7 @@
 # Helper functions for ML tasks
 
 import torch
-from PIL import Image
+from PIL import Image, ImageDraw
 import torchvision.transforms as transforms
 import io
 from sklearn.cluster import DBSCAN
@@ -27,7 +27,7 @@ def preprocess_image(image, resolution_m_per_pixel: float):
     # Normalize
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
     image = transform(image)
@@ -128,3 +128,4 @@ def make_predictions(model: torch.nn.Module, data: list):
             pred_labels.append(pred_prob.argmax(dim=0).item())  # Store predicted class label
 
     return pred_labels, pred_probs
+
