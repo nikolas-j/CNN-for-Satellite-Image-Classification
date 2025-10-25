@@ -8,5 +8,6 @@ class Settings(BaseSettings):
 
     # Configure the model to be used
     MODEL_PATH: str = "app/ml/models/model_weights_v1.pth"
+    MAX_IMAGE_SIZE_MB: int = 100  # Max image size in megabytes
 
 settings = Settings()

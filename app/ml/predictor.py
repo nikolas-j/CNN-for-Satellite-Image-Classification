@@ -2,47 +2,42 @@
 
 import torch
 from app.ml.models.cnn_ship_classifier_model import CNNShipClassifier
-import torch.nn.functional as F
-import io
-import torchvision.transforms as transforms
-from PIL import Image
-
-from app.ml.utils import make_predictions
-
+from app.ml.utils import make_predictions, tile_image, preprocess_image, cluster_positions
 
 class ShipClassifier:
-    def __init__(self, model_path: str):
+    def __init__(self, model_path: str = "app/ml/models/model_weights_v1.pth"):
         """
         Initializes the ShipClassifier with the given model path.
         Loads the model weights from the specified path.
         """
-
+        
         self.model = CNNShipClassifier()
         self.model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         self.model.eval()
 
-        # Define image transformations
-        self.transform = transforms.Compose([
-            transforms.Resize((80, 80)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
+        self.TILE_SIZE = 80  # Depends on model input size
+        self.STRIDE = 20     # Stride for tiling -> Trade off between speed and accuracy
+        self.DISTANCE_THRESHOLD = 150  # meters for clustering positions
 
     # Called from endpoints.py
     # Takes in image bytes from uploaded file
     # Returns predicted label and confidence score
-    def predict(self, image_bytes: bytes):
+    def predict(self, image_bytes: bytes, resolution_m_per_pixel: float):
 
         # Preprocess the png image into [3x80x80] tensor for the model
-        image = Image.open(io.BytesIO(image_bytes))
-        image = self.transform(image)
+        image_scaled_normalized = preprocess_image(image_bytes, resolution_m_per_pixel)
 
-        images = [image.squeeze()] # Placeholder for single image list
+        # Tile the image into overlapping tiles
+        images, image_positions = tile_image(image_scaled_normalized, tile_size=self.TILE_SIZE, stride=self.STRIDE) 
 
-        # Make prediction using utility function which calls the model
-        # Can be extended to batch predictions in the future
-        # Currently returns single prediction label and probability in a list
+        # Make prediction
+        # pred_prob can be used for confidence scores if needed
         pred_label, pred_prob = make_predictions(self.model, images)
 
-        # Modify later
-        return pred_label[0], pred_prob[0]
+        # Cluster positions to avoid multiple detections of the same ship
+        ship_count, positions = cluster_positions(pred_label, 
+                                                  image_positions, 
+                                                  self.DISTANCE_THRESHOLD / (resolution_m_per_pixel * self.STRIDE))
+
+        # return ship count and positions
+        return ship_count, positions

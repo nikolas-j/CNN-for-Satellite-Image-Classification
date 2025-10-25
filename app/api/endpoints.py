@@ -1,6 +1,6 @@
 # Defines the API logic
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, Form, UploadFile, File, HTTPException, status
 from app.schemas.prediction import PredictionResponse
 from app.ml.predictor import ShipClassifier # ML model
 from app.core.config import settings # Model paths
@@ -20,35 +20,50 @@ predictor = ShipClassifier(
 @router.post("/predict", 
              response_model=PredictionResponse, 
              tags=["Prediction"])
-async def predict_image(file: UploadFile = File(...)):
+
+# Define what inputs the endpoint accepts
+async def predict_image(
+    file: UploadFile = File(..., description="The satellite image in PNG format."),
+    resolution_m_per_pixel: float = Form(..., description="Image resolution in meters per pixel (e.g., 3.0)")
+):
     """
     Accepts a .png satellite image, runs it through the classifier,
     and returns the prediction and confidence score.
     """
     
-    # Validation: Check if the file is a PNG
+    # Validation
     if file.content_type != "image/png":
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             detail="Unsupported file type. Please upload a .png image."
         )
+    
+    if resolution_m_per_pixel <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Resolution must be a positive value."
+        )
 
     try:
-        # Get file contents
-        # We read the file's bytes. 'await file.read()' loads it into memory.
-        # For very large files, you'd use 'file.file' which is a spooled file.
+        # Check file size and read contents
         image_bytes = await file.read()
+        file_size_mb = len(image_bytes) / (1024 * 1024)  # Convert bytes to megabytes
+        if file_size_mb > settings.MAX_IMAGE_SIZE_MB:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail=f"File size exceeds the maximum limit of {settings.MAX_IMAGE_SIZE_MB} MB."
+            )
         
         # Run Prediction
-        prediction_label, prediction_probability = predictor.predict(image_bytes)
+        # Returns ship_count in the image and positions
+        ship_count, positions = predictor.predict(image_bytes, resolution_m_per_pixel)
         
         # Format and return the JSON response
         # Pydantic model defined in schemas.py
         return PredictionResponse(
             filename=file.filename,
-            content_type=file.content_type,
-            prediction=prediction_label,
-            confidence=prediction_probability
+            ship_count=ship_count,
+            positions=positions
         )
         
     except Exception as e:
