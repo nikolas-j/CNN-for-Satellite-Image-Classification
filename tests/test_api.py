@@ -29,7 +29,6 @@ def test_predict_success():
             data=data_payload
         )
     
-    
     assert response.status_code == 200
     data = response.json()
     assert "ship_count" in data
