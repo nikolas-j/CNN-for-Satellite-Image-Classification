@@ -49,6 +49,7 @@ htmlcov/
 .cache
 coverage.xml
 *.cover
+.pytest_cache/
 
 # Distribution
 dist/

@@ -37,8 +37,20 @@ The dataset used for training and testing are from Planet's openly licensed Open
 - The user receives the ship count in the image as well as positions of the identified ships.
 
 
+### Installation and Setup:
+
+1. **Install dependencies using uv:**
+   ```bash
+   uv sync
+   ```
+
 ### Run and test with uvicorn:
 
-1. Type in the project root directory: *uvicorn app.main:app --reload*
-2. After the server is running go to: http://127.0.0.1:8000/docs to try the API out.
+1. **Start the FastAPI server:**
+   ```bash
+   uv run uvicorn app.main:app --reload
+   ```
+
+2. **Access the interactive API documentation:**
+   - Open your browser and go to: http://127.0.0.1:8000/docs to try the API out.
 
